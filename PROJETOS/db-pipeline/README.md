@@ -1,23 +1,17 @@
-# learn-python
+# Projeto de Saneamento e Engenharia de Dados
 
-Repositório destinado ao ensino da linguagem python para iniciantes.
+Este projeto tem como objetivo atender uma demanda para saneamento de dados em um processo de engenharia de dados. Utilizamos bibliotecas como `pandas`, `sqlite3` e `dotenv` para realizar as operações necessárias.
 
-<img src="imgs/python.jpg" style="max-width:1000px; "/>
+## Estrutura do Projeto
 
+- `data_clean(df, metadados)`: Função principal para saneamento dos dados.
+- `feat_eng(df, corrige_hr, std_str, tipos_formatted)`: Função para realizar a engenharia de features no DataFrame.
+- `save_data_sqlite(df)`: Função para salvar os dados em um banco de dados SQLite.
+- `fetch_sqlite_data(table)`: Função para buscar dados do banco de dados SQLite.
 
-### Conteúdo
----
-1. Fundamentos
-2. Pandas
-3. Visualização de Dados
-4. Análise de Dados
-5. Ingestão de dados
+## Tecnologias Utilizadas
 
-### Organização do repositório
----
-O repositório está organizado da seguinte forma
-- DESAFIOS : pequenos desafios de programação para testar suas habilidades de código e raciocínio lógico ;
-- NOTEBOOKS : notebooks com exemplos dos conteúdos abordados ;
-- PROJETOS : aplicação dos conteúdos abordados em pequenos projetos. 
-
-As imagens utilizadas nos notebooks foram extraídas de: https://pythoniluminado.netlify.app
+- Python
+- Pandas
+- SQLite
+- Dotenv
