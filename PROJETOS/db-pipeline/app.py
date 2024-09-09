@@ -50,6 +50,23 @@ Returns:
     pd.DataFrame: DataFrame do Pandas com as features de engenharia aplicadas.
     """
 
+    def classifica_hora(hra):
+        """
+        função para classificar periodo do dia da data do voo para MANHÃ, TARDE, NOITE E MADRUGADA
+        """
+        if 0 <= hra < 6: return "MADRUGADA"
+        elif 6 <= hra < 12: return "MANHA"
+        elif 12 <= hra < 18: return "TARDE"
+        else: return "NOITE"
+
+
+    def flg_status(atraso):
+        """
+        função para criar a coluna com o status do voo
+        """
+        if atraso > 0.5 : return "ATRASO"
+        else: return "ONTIME"
+
     df_work = df.copy()
 
     # Consolida as listas de canpos
@@ -60,9 +77,31 @@ Returns:
         # deleta coluna com sufixo "_formatted"
         df_work.drop(f'{col}_formatted', axis=1, inplace=True)
     
-    # Formata data type das colunas do df final
+    # Formata data type das colunas do df
     df_work = utils.convert_data_type(df_work, tipos_formatted)
     
+
+    # tempo_voo_esperado -> datetime_chegada - datetime_partida
+    df_work['tempo_voo_esperado'] = (df_work['datetime_chegada'] - df_work['datetime_partida']).dt.total_seconds() / 3600
+
+
+    # dia_semana -> [data do voo]dt.day_of_week hint: tem que ser do tipo datetime para funcionar
+    df_work['dia_semana'] = df_work['data_voo'].dt.day_of_week
+
+
+    # horario -> classificar em manhã, tarde, noite e madrugada
+    df_work["horario"] = df_work.loc[:,"datetime_partida"].dt.hour.apply(lambda x: classifica_hora(x))
+
+
+    # tempo_voo_hr -> tempo de voo que está em minutos, mas em horas
+    df_work["tempo_voo_hr"] = df_work["tempo_voo"] /60
+
+    # atraso -> tempo_voo_hr  - tempo_voo_esperado 
+    df_work["atraso"] = df_work["tempo_voo_hr"] - df_work["tempo_voo_esperado"] 
+
+    # flg_status -> classificar quanto tempo de atraso é "ATRASO" e os demais casos "ON-TIME"
+    df_work["flg_status"] = df_work.loc[:,"atraso"].apply(lambda x: flg_status(x))
+
 
     #colocar log info
     logger.info(
@@ -104,7 +143,7 @@ if __name__ == "__main__":
     utils.null_check(df, metadados["null_tolerance"])
     utils.keys_check(df, metadados["cols_chaves_renamed"])
     df = feat_eng(df, metadados['std_str'], metadados['corrige_hr'], metadados['tipos_formatted'])
-    #save_data_sqlite(df)
-    # fetch_sqlite_data(metadados["tabela"][0])
-    df.head(500).to_excel('data/amostragem_saida.xlsx', index=False)
+    save_data_sqlite(df)
+    fetch_sqlite_data(metadados["tabela"][0])
+    # df.head(500).to_excel('data/amostragem_saida.xlsx', index=False)
     logger.info(f'Fim da execução ; {datetime.datetime.now()}')
